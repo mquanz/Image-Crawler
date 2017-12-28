@@ -1,16 +1,19 @@
 import os
 from PIL import Image
+from collections import Counter
 
-#note that backslashes in path have to be doubled
-PATH = 'C:\\Users\\Ines\\Documents\\MartinDokumente\\projects\\Pictures'
 
 def main():
+    #note that backslashes in PATH have to be doubled
+    PATH = 'C:\\Users\\Ines\\Documents\\MartinDokumente\\projects\\Pictures'
+    
     #change working directory to PATH
-    os.chdir(PATH)
-    print('The PATH is:')
-    print(os.getcwd())
+    def change_directory():
+        os.chdir(PATH)
+        print('The working directory is changed to:')
+        print(os.getcwd())
 
-    #get elements, what is folder & what is picture?
+    #get elements in PATH, what is folder & what is picture?
     def getelements():
         elements = (os.listdir())
         pictures = []
@@ -23,25 +26,36 @@ def main():
                 folders.append(e)
         return pictures, folders
     
-    #get exif of pictures
-    def getexif():
+    #get exif of unsorted pictures in PATH
+    def getexif(picture_list):
         pic_info = []
-        for e in pictures:
+        for e in picture_list:
             im = Image.open(PATH + '\\' + e)
-            pic_info.append(im.format + str(im.size) + im.mode + ' ' + im._getexif()[36867])
+            pic_info.append((im._getexif()[36867], im.format, im.size, im.mode))
         return pic_info
 
-    #change last element name
-    #os.rename(elements[-1], 'Zehleabend2016')
-   
-    pictures, folders = getelements()
-    print('\nPictures')
-    print(pictures)
-    print('\nFolders')
-    print(folders)
+    #arrange unsorted pictures to folder
+    def arrange(pic_info):
+        years = []
+        for e in pic_info:
+            years.append(int(e[0][0:e[0].find(':')]))
+        print(Counter(years).most_common(1)[0][0])
 
+    
+    #change last element name
+    #os.rename(elements[-1], 'newname')
+
+
+
+    #Test
+    change_directory()
+    print('\nPictures')
+    print(getelements()[0])
+    print('\nFolders')
+    print(getelements()[1])
     print('\nEXIFs:')
-    print(getexif())
+    print(getexif(getelements()[0]))
+    arrange(getexif(getelements()[0]))
 
 if __name__ == '__main__':
     main()
