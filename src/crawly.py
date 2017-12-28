@@ -15,17 +15,21 @@ def main():
 
     #get elements in PATH, what is folder & what is picture?
     def getelements():
-        elements = (os.listdir())
         pictures = []
         folders = []
-        for e in elements:
+        for e in os.listdir():
             try:
                 Image.open(PATH + '\\' + e)
                 pictures.append(e)
             except IOError:
                 folders.append(e)
+#        for e in folders:
+#            try:
+#                os.chdir(PATH + '\\' + e)
+#            except NotADirectoryError:
+#                print(e + ' is not a folder.')
         return pictures, folders
-    
+
     #get exif of unsorted pictures in PATH
     def getexif(picture_list):
         pic_info = []
@@ -35,17 +39,22 @@ def main():
         return pic_info
 
     #arrange unsorted pictures to folder
-    def arrange(pic_info):
-        years = []
-        for e in pic_info:
-            years.append(int(e[0][0:e[0].find(':')]))
-        print(Counter(years).most_common(1)[0][0])
-
+    def arrange(pic_info, picture_list):
+        #when there are no unsorted pictures code wont be executed
+        if picture_list != []:
+            years = []
+            for e in pic_info:
+                years.append(int(e[0][0:e[0].find(':')]))
+            #get most common year in years
+            folder_name = str(Counter(years).most_common(1)[0][0])
+            #create new folder
+            if not os.path.exists(PATH + '\\' + folder_name):
+                os.makedirs(PATH + '\\' + folder_name)
+            for e in picture_list:
+                os.rename(PATH + '\\' + e, PATH + '\\' + folder_name + '\\' + e)
     
     #change last element name
     #os.rename(elements[-1], 'newname')
-
-
 
     #Test
     change_directory()
@@ -55,7 +64,7 @@ def main():
     print(getelements()[1])
     print('\nEXIFs:')
     print(getexif(getelements()[0]))
-    arrange(getexif(getelements()[0]))
+#    arrange(getexif(getelements()[0]), getelements()[0])
 
 if __name__ == '__main__':
     main()
