@@ -17,10 +17,10 @@ def main():
         folders = []
         for e in elements:
             try:
-                os.chdir(PATH + '\\' + e)
-                folders.append(e)
-            except NotADirectoryError:
+                Image.open(PATH + '\\' + e)
                 pictures.append(e)
+            except IOError:
+                folders.append(e)
         return pictures, folders
     
     #get exif of pictures
@@ -35,7 +35,6 @@ def main():
     #os.rename(elements[-1], 'Zehleabend2016')
    
     pictures, folders = getelements()
-    pictures.pop()
     print('\nPictures')
     print(pictures)
     print('\nFolders')
