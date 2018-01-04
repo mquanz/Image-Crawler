@@ -4,17 +4,17 @@ from collections import Counter
 
 
 def main():
-    #note that backslashes in PATH have to be doubled
-    PATH = 'C:\\Users\\Ines\\Documents\\MartinDokumente\\projects\\Pictures'
+    #note that backslashes in START_PATH have to be doubled
+    START_PATH = 'C:\\Users\\Ines\\Documents\\MartinDokumente\\projects\\Pictures'
     
-    #change working directory to PATH
+    #change working directory to START_PATH
     def change_directory():
-        os.chdir(PATH)
+        os.chdir(START_PATH)
         print('The working directory is changed to:')
         print(os.getcwd())
 
     #get elements in PATH, what is folder & what is picture?
-    def getelements():
+    def getelements(PATH):
         pictures = []
         folders = []
         for e in os.listdir():
@@ -27,7 +27,7 @@ def main():
         return pictures, folders
 
     #get exif of unsorted pictures in PATH
-    def getexif(picture_list):
+    def getexif(PATH, picture_list):
         pic_info = []
         for e in picture_list:
             im = Image.open(PATH + '\\' + e)
@@ -35,7 +35,7 @@ def main():
         return pic_info
 
     #arrange unsorted pictures to folder
-    def arrange(pic_info, picture_list):
+    def arrange(PATH, pic_info, picture_list):
         #when there are no unsorted pictures code wont be executed
         if picture_list != []:
             years = []
@@ -54,13 +54,14 @@ def main():
 
     #Test
     change_directory()
-    print('\nPictures')
-    print(getelements()[0])
-    print('\nFolders')
-    print(getelements()[1])
-    print('\nEXIFs:')
-    print(getexif(getelements()[0]))
-#    arrange(getexif(getelements()[0]), getelements()[0])
+    pictures = getelements(START_PATH)[0]
+    folders = getelements(START_PATH)[1]
+    EXIFs = getexif(START_PATH, pictures)
+    print('\nPictures:\n' + str(pictures))
+    print('\nFolders:\n' + str(folders))
+    print('\nEXIFs:\n' + str(EXIFs))
+    
+#    arrange(START_PATH, EXIFs, pictures)
 
 if __name__ == '__main__':
     main()
