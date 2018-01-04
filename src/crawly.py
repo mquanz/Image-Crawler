@@ -4,7 +4,7 @@ from collections import Counter
 
 
 def main():
-    #note that backslashes in START_PATH have to be doubled
+    #note that backslashes in PATH's have to be doubled
     START_PATH = 'C:\\Users\\Ines\\Documents\\MartinDokumente\\projects\\Pictures'
     
     #change working directory to START_PATH
@@ -12,6 +12,19 @@ def main():
         os.chdir(START_PATH)
         print('The working directory is changed to:')
         print(os.getcwd())
+
+    #list all files starting with PATH (normally START_PATH)
+    def list_files(PATH):
+        for root, dirs, files in os.walk(PATH):
+            print(root)
+            print(dirs)
+            print(files)
+#            level = root.replace(PATH, '').count(os.sep)
+#            indent = ' ' * 4 * (level)
+#            print('{}{}/'.format(indent, os.path.basename(root)))
+#            subindent = ' ' * 4 * (level + 1)
+#            for f in files:
+#                print('{}{}'.format(subindent, f))
 
     #get elements in PATH, what is folder & what is picture?
     def getelements(PATH):
@@ -34,7 +47,7 @@ def main():
             pic_info.append((im._getexif()[36867], im.format, im.size, im.mode))
         return pic_info
 
-    #arrange unsorted pictures to folder
+    #arrange unsorted pictures to folder named by most common year of recording date
     def arrange(PATH, pic_info, picture_list):
         #when there are no unsorted pictures code wont be executed
         if picture_list != []:
@@ -54,6 +67,7 @@ def main():
 
     #Test
     change_directory()
+    list_files(START_PATH)
     pictures = getelements(START_PATH)[0]
     folders = getelements(START_PATH)[1]
     EXIFs = getexif(START_PATH, pictures)
