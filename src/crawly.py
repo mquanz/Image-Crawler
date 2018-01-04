@@ -22,12 +22,8 @@ def main():
                 Image.open(PATH + '\\' + e)
                 pictures.append(e)
             except IOError:
-                folders.append(e)
-#        for e in folders:
-#            try:
-#                os.chdir(PATH + '\\' + e)
-#            except NotADirectoryError:
-#                print(e + ' is not a folder.')
+                if os.path.isdir(PATH + '\\' + e):
+                    folders.append(e)
         return pictures, folders
 
     #get exif of unsorted pictures in PATH
