@@ -33,13 +33,13 @@ def main():
             #opening image with PIL
             im = Image.open(PATH + '\\' + e)
             try:
-                pic_info.append((im._getexif()[36867], im.format, im.size, im.mode))
+                pic_info.append(im._getexif()[36867])
             #TypeError occurs, when picture dont have a recording date
             except TypeError:
-                print(e + ' has a TypeError, the picture doesnt have a date!!!')
-            #KeyError occurs with some new cameras having different exif location
+                print(e + ' has a TypeError, the picture doesn´t have a recording date.')
+            #KeyError occurs, wheb fotos taken by some new cameras having different exif location
             except KeyError:
-                print(e + ' has a KeyError!!!.')
+                print(e + ' has a KeyError! Program doesn´t find the EXIF location.')
         return pic_info
 
     #arrange unsorted pictures to folder named by most common year of recording date
@@ -70,16 +70,6 @@ def main():
                 print('\n' + root)
                 print(pictures)
                 print(getexif(root, pictures))
-                
-#            print(dirs)
-#            print(files)
-#            level = root.replace(PATH, '').count(os.sep)
-#            print(level)
-#            indent = ' ' * 4 * (level)
-#            print('{}{}/'.format(indent, os.path.basename(root)))
-#            subindent = ' ' * 4 * (level + 1)
-#            for f in files:
-#                print('{}{}'.format(subindent, f))
 
     
     #change last element name
