@@ -6,6 +6,28 @@ from collections import Counter
 def main():
     #note that backslashes in PATH's have to be doubled
     START_PATH = 'C:\\Users\\Ines\\Documents\\MartinDokumente\\projects\\Pictures'
+
+    #Generic tree node
+    class Tree():
+        def __init__(self, name = 'root', children = None):
+            self.name = name
+            self.children = []
+            if children is not None:
+                for child in children:
+                    self.add_child(child)
+        def __repr__(self):
+            return self.name + str(self.children)
+        def add_child(self, node):
+            assert isinstance(node, Tree)
+            self.children.append(node)
+
+        def print_tree(self):
+            print(self.name)
+            print(self.children)
+
+    t = Tree('Olaf', [Tree('Heinz'), Tree('Gertrud'), Tree('Wolle', [Tree('Thomas'), Tree('Hildegard')])])
+    t.print_tree()
+
     
     #change working directory to START_PATH
     def change_directory():
@@ -17,9 +39,10 @@ def main():
     def list_files(PATH):
         for root, dirs, files in os.walk(PATH):
             print(root)
-            print(dirs)
-            print(files)
-#            level = root.replace(PATH, '').count(os.sep)
+#            print(dirs)
+#            print(files)
+            level = root.replace(PATH, '').count(os.sep)
+            print(level)
 #            indent = ' ' * 4 * (level)
 #            print('{}{}/'.format(indent, os.path.basename(root)))
 #            subindent = ' ' * 4 * (level + 1)
@@ -30,7 +53,7 @@ def main():
     def getelements(PATH):
         pictures = []
         folders = []
-        for e in os.listdir():
+        for e in os.listdir(PATH):
             try:
                 Image.open(PATH + '\\' + e)
                 pictures.append(e)
@@ -39,7 +62,7 @@ def main():
                     folders.append(e)
         return pictures, folders
 
-    #get exif of unsorted pictures in PATH
+    #get exif of pictures in PATH
     def getexif(PATH, picture_list):
         pic_info = []
         for e in picture_list:
