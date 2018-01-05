@@ -6,48 +6,12 @@ from collections import Counter
 def main():
     #note that backslashes in PATH's have to be doubled
     START_PATH = 'C:\\Users\\Ines\\Documents\\MartinDokumente\\projects\\Pictures'
-
-    #Generic tree node
-    class Tree():
-        def __init__(self, name = 'root', children = None):
-            self.name = name
-            self.children = []
-            if children is not None:
-                for child in children:
-                    self.add_child(child)
-        def __repr__(self):
-            return self.name + str(self.children)
-        def add_child(self, node):
-            assert isinstance(node, Tree)
-            self.children.append(node)
-
-        def print_tree(self):
-            print(self.name)
-            print(self.children)
-
-    t = Tree('Olaf', [Tree('Heinz'), Tree('Gertrud'), Tree('Wolle', [Tree('Thomas'), Tree('Hildegard')])])
-    t.print_tree()
-
     
     #change working directory to START_PATH
     def change_directory():
         os.chdir(START_PATH)
         print('The working directory is changed to:')
         print(os.getcwd())
-
-    #list all files starting with PATH (normally START_PATH)
-    def list_files(PATH):
-        for root, dirs, files in os.walk(PATH):
-            print(root)
-#            print(dirs)
-#            print(files)
-            level = root.replace(PATH, '').count(os.sep)
-            print(level)
-#            indent = ' ' * 4 * (level)
-#            print('{}{}/'.format(indent, os.path.basename(root)))
-#            subindent = ' ' * 4 * (level + 1)
-#            for f in files:
-#                print('{}{}'.format(subindent, f))
 
     #get elements in PATH, what is folder & what is picture?
     def getelements(PATH):
@@ -66,8 +30,16 @@ def main():
     def getexif(PATH, picture_list):
         pic_info = []
         for e in picture_list:
+            #opening image with PIL
             im = Image.open(PATH + '\\' + e)
-            pic_info.append((im._getexif()[36867], im.format, im.size, im.mode))
+            try:
+                pic_info.append((im._getexif()[36867], im.format, im.size, im.mode))
+            #TypeError occurs, when picture dont have a recording date
+            except TypeError:
+                print(e + ' has a TypeError, the picture doesnt have a date!!!')
+            #KeyError occurs with some new cameras having different exif location
+            except KeyError:
+                print(e + ' has a KeyError!!!.')
         return pic_info
 
     #arrange unsorted pictures to folder named by most common year of recording date
@@ -84,19 +56,44 @@ def main():
                 os.makedirs(PATH + '\\' + folder_name)
             for e in picture_list:
                 os.rename(PATH + '\\' + e, PATH + '\\' + folder_name + '\\' + e)
+                
+    #list all files starting with PATH (normally START_PATH)
+    def crawl(PATH):
+        for root, dirs, files in os.walk(PATH):
+            #sort unsorted pictures in START_PARH
+            if root is START_PATH:
+                pictures = getelements(root)[0]
+                EXIFs = getexif(root, pictures)
+                arrange(root, EXIFs, pictures)
+            else:
+                pictures = getelements(root)[0]
+                print('\n' + root)
+                print(pictures)
+                print(getexif(root, pictures))
+                
+#            print(dirs)
+#            print(files)
+#            level = root.replace(PATH, '').count(os.sep)
+#            print(level)
+#            indent = ' ' * 4 * (level)
+#            print('{}{}/'.format(indent, os.path.basename(root)))
+#            subindent = ' ' * 4 * (level + 1)
+#            for f in files:
+#                print('{}{}'.format(subindent, f))
+
     
     #change last element name
     #os.rename(elements[-1], 'newname')
 
     #Test
     change_directory()
-    list_files(START_PATH)
-    pictures = getelements(START_PATH)[0]
-    folders = getelements(START_PATH)[1]
-    EXIFs = getexif(START_PATH, pictures)
-    print('\nPictures:\n' + str(pictures))
-    print('\nFolders:\n' + str(folders))
-    print('\nEXIFs:\n' + str(EXIFs))
+    crawl(START_PATH)
+#    pictures = getelements(START_PATH)[0]
+#    folders = getelements(START_PATH)[1]
+#    EXIFs = getexif(START_PATH, pictures)
+#    print('\nPictures:\n' + str(pictures))
+#    print('\nFolders:\n' + str(folders))
+#    print('\nEXIFs:\n' + str(EXIFs))
     
 #    arrange(START_PATH, EXIFs, pictures)
 
