@@ -28,26 +28,26 @@ def main():
 
     #get exif of pictures in PATH
     def getexif(PATH, picture_list):
-        pic_info = []
+        picture_info = []
         for e in picture_list:
             #opening image with PIL
             im = Image.open(PATH + '\\' + e)
             try:
-                pic_info.append(im._getexif()[36867])
+                picture_info.append(im._getexif()[36867])
             #TypeError occurs, when picture dont have a recording date
             except TypeError:
-                print(e + ' has a TypeError, the picture doesn´t have a recording date.')
+                print('\n' + e + ' has a TypeError, the picture doesn´t have a recording date.')
             #KeyError occurs, wheb fotos taken by some new cameras having different exif location
             except KeyError:
-                print(e + ' has a KeyError! Program doesn´t find the EXIF location.')
-        return pic_info
+                print('\n' + e + ' has a KeyError! Program doesn´t find the EXIF location.')
+        return picture_info
 
     #arrange unsorted pictures to folder named by most common year of recording date
-    def arrange(PATH, pic_info, picture_list):
+    def arrange(PATH, picture_info, picture_list):
         #when there are no unsorted pictures code wont be executed
         if picture_list != []:
             years = []
-            for e in pic_info:
+            for e in picture_info:
                 years.append(int(e[0][0:e[0].find(':')]))
             #get most common year in years
             folder_name = str(Counter(years).most_common(1)[0][0])
@@ -56,10 +56,17 @@ def main():
                 os.makedirs(PATH + '\\' + folder_name)
             for e in picture_list:
                 os.rename(PATH + '\\' + e, PATH + '\\' + folder_name + '\\' + e)
+
+#    def rename_folder(PATH, picture_info, picture_list):
+#            years = []
+#            for e in picture_info:
+#                years.append(int(e[0][0:e[0].find(':')]))
+#            #get most common year in years
+#            folder_name = str(Counter(years).most_common(1)[0][0])
                 
-    #list all files starting with PATH (normally START_PATH)
-    def crawl(PATH):
-        for root, dirs, files in os.walk(PATH):
+    #crawl through directories starting with START_PATH
+    def crawl():
+        for root, dirs, files in os.walk(START_PATH):
             #sort unsorted pictures in START_PARH
             if root is START_PATH:
                 pictures = getelements(root)[0]
@@ -77,7 +84,7 @@ def main():
 
     #Test
     change_directory()
-    crawl(START_PATH)
+    crawl()
 #    pictures = getelements(START_PATH)[0]
 #    folders = getelements(START_PATH)[1]
 #    EXIFs = getexif(START_PATH, pictures)
