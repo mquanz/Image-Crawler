@@ -1,4 +1,5 @@
 import os
+import re
 from PIL import Image
 from collections import Counter
 
@@ -6,6 +7,8 @@ from collections import Counter
 def main():
     #note that backslashes in PATH's have to be doubled
     START_PATH = 'C:\\Users\\Ines\\Documents\\MartinDokumente\\projects\\Pictures'
+
+    ERRORS = []
     
     #change working directory to START_PATH
     def change_directory():
@@ -36,10 +39,10 @@ def main():
                 picture_info.append(im._getexif()[36867])
             #TypeError occurs, when picture dont have a recording date
             except TypeError:
-                print('\n' + e + ' has a TypeError, the picture doesn´t have a recording date.')
+                ERRORS.append('\n' + e + ' has a TypeError, the picture doesn´t have a recording date.')
             #KeyError occurs, wheb fotos taken by some new cameras having different exif location
             except KeyError:
-                print('\n' + e + ' has a KeyError! Program doesn´t find the EXIF location.')
+                ERRORS.append('\n' + e + ' has a KeyError! Program doesn´t find the EXIF location.')
         return picture_info
 
     #arrange unsorted pictures to folder named by most common year of recording date
@@ -48,7 +51,11 @@ def main():
         if picture_list != []:
             years = []
             for e in picture_info:
-                years.append(int(e[0][0:e[0].find(':')]))
+                #most EXIFs using : as separator for dates, other will be ignored
+                try:
+                    years.append(int(e[:e.find(':')]))
+                except ValueError:
+                    ERRORS.append('\n' + e + 'has a strange separator and will be ignored.')
             #get most common year in years
             folder_name = str(Counter(years).most_common(1)[0][0])
             #create new folder
@@ -57,14 +64,27 @@ def main():
             for e in picture_list:
                 os.rename(PATH + '\\' + e, PATH + '\\' + folder_name + '\\' + e)
 
-#    def rename_folder(PATH, picture_info, picture_list):
-#            years = []
-#            for e in picture_info:
-#                years.append(int(e[0][0:e[0].find(':')]))
-#            #get most common year in years
-#            folder_name = str(Counter(years).most_common(1)[0][0])
+    def rename_folder(PATH, picture_info, picture_list):
+        #when there are no unsorted pictures or no EXIF´s code won´t be executed
+        if picture_info != []:
+            years = []
+            for e in picture_info:
+                #most EXIFs using : as separator for dates, other will be ignored
+                try:
+                    years.append(int(e[:e.find(':')]))
+                except ValueError:
+                    ERRORS.append('\n' + e + 'has a strange separator and will be ignored.')
+            #get most common year in years
+            year = str(Counter(years).most_common(1)[0][0])
+            #look for date in old foldername and if there is no number rename folder
+            old_name = os.path.basename(os.path.normpath(PATH))
+            if not re.search('\d+', old_name):
+                try:
+                    os.rename(PATH, PATH + ' ' + year)
+                except PermissionError:
+                    ERRORS.append('Impossible to change name of ' + old_name + '. I don´t have the permission...')
                 
-    #crawl through directories starting with START_PATH
+    #crawl through directories starting with START_PATH                 
     def crawl():
         for root, dirs, files in os.walk(START_PATH):
             #sort unsorted pictures in START_PARH
@@ -74,25 +94,17 @@ def main():
                 arrange(root, EXIFs, pictures)
             else:
                 pictures = getelements(root)[0]
-                print('\n' + root)
-                print(pictures)
-                print(getexif(root, pictures))
-
-    
-    #change last element name
-    #os.rename(elements[-1], 'newname')
+                EXIFs = getexif(root, pictures)
+                rename_folder(root, EXIFs, pictures)
+                
 
     #Test
     change_directory()
     crawl()
-#    pictures = getelements(START_PATH)[0]
-#    folders = getelements(START_PATH)[1]
-#    EXIFs = getexif(START_PATH, pictures)
-#    print('\nPictures:\n' + str(pictures))
-#    print('\nFolders:\n' + str(folders))
-#    print('\nEXIFs:\n' + str(EXIFs))
-    
-#    arrange(START_PATH, EXIFs, pictures)
+
+    print('\nERRORS:')
+    for e in ERRORS:
+        print(e)
 
 if __name__ == '__main__':
     main()
