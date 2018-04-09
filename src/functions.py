@@ -38,6 +38,8 @@ def getexif(PATH, picture_list):
         #KeyError occurs, wheb fotos taken by some new cameras having different exif location
         except KeyError:
             ERRORS.append('\n' + e + ' has a KeyError! Program doesn´t find the EXIF location.')
+        except AttributeError:
+            ERRORS.append('\n' + e + ' has an AttributeError! Program doesn´t find the EXIF location.')
     return picture_info
 
 #arrange unsorted pictures to folder named by most common year of recording date
